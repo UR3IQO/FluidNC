@@ -53,6 +53,14 @@ void make_coordinate(CoordIndex index, const char* name) {
     int_proxies.emplace_back(                                                                                                              \
         std::make_unique<MachineConfigProxySetting<int>>(number, name, [](MachineConfig const& config) { return configvar; }));
 
+static int has_laser(MachineConfig const& config) {
+
+     for (auto s : Spindles::SpindleFactory::objects())
+         if (strcmp(s->name(), "Laser") == 0) return 1;
+
+    return 0;
+}
+
 void make_settings() {
     Setting::init();
 
@@ -112,4 +120,7 @@ void make_settings() {
     INT_PROXY("20", "Grbl/SoftLimitsEnable", config._axes->_axis[0]->_softLimits)
     INT_PROXY("21", "Grbl/HardLimitsEnable", config._axes->hasHardLimits())
     INT_PROXY("22", "Grbl/HomingCycleEnable", (bool)Axes::homingMask)
+
+    int_proxies.emplace_back(
+        std::make_unique<MachineConfigProxySetting<int>>("32", "Grbl/IsLaser", has_laser));
 }
